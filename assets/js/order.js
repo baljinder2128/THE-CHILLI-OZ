@@ -5,11 +5,41 @@
 
   var els = {};
 
-  function lineLabel(line) {
-    var bits = [];
-    if (line.milk) bits.push(line.milk + " milk");
-    if (line.extraShot) bits.push("extra shot");
-    return bits.join(", ");
+  var lineLabel = C.lineLabel;
+
+  // Minutes after midnight for the chosen pickup slot ("ASAP" means now plus prep time).
+  function pickupMinutes() {
+    var v = els.time.value;
+    if (!v) return null;
+    if (v === "ASAP") return C.cafeNow().minutes + CFG.prepMinutes;
+    var m = /^(\d+):(\d+)(am|pm)$/.exec(v);
+    if (!m) return null;
+    var h = parseInt(m[1], 10) % 12 + (m[3] === "pm" ? 12 : 0);
+    return h * 60 + parseInt(m[2], 10);
+  }
+
+  // Items such as breakfast that can't be served at the chosen pickup time.
+  function lateItems() {
+    var at = pickupMinutes();
+    if (at === null) return [];
+    var names = [];
+    C.readCart().forEach(function (l) {
+      var until = C.availableUntil(l.id);
+      var it = C.findItem(l.id);
+      if (until !== null && at > until && it && names.indexOf(it.name) === -1) names.push(it.name);
+    });
+    return names;
+  }
+
+  function checkTiming() {
+    var late = lateItems();
+    if (late.length) {
+      setMessage("warn", "Breakfast is served until 11:30am. Please choose an earlier pickup time, or remove: " +
+        late.map(C.esc).join(", ") + ".");
+    } else if (els.msg.className.indexOf("warn") > -1) {
+      els.msg.hidden = true;
+    }
+    return late.length === 0;
   }
 
   function total(cart) {
@@ -127,6 +157,7 @@
     var phone = els.form.elements.phone;
     phone.setCustomValidity(phone.value.replace(/\D/g, "").length >= 8 ? "" : "Please enter a phone number we can call");
     if (!els.form.reportValidity()) return;
+    if (!checkTiming()) return;
 
     var cart = C.readCart();
     if (!cart.length) return;
@@ -212,7 +243,9 @@
       els.submit.disabled = true;
     }
     els.cart.addEventListener("click", onCartClick);
-    els.day.addEventListener("change", fillTimes);
+    els.day.addEventListener("change", function () { fillTimes(); checkTiming(); });
+    els.time.addEventListener("change", checkTiming);
+    document.addEventListener("cart:change", checkTiming);
     els.form.addEventListener("submit", onSubmit);
   });
 })();

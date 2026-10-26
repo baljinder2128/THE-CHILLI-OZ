@@ -68,8 +68,9 @@ order number on screen, a new row in the **Orders** tab, and an email in your in
 
 | To change… | Edit this file |
 |---|---|
-| Menu items, descriptions, prices, sold out | `assets/js/menu-data.js` (add `soldOut: true` to hide an item for the day) |
-| Milk options and extra shot price | top of `assets/js/menu-data.js` |
+| Menu items, descriptions, prices, sizes, sauces, sold out | `assets/js/menu-data.js` (add `soldOut: true` to hide an item for the day) |
+| Section photos | `photo` lines in `assets/js/menu-data.js`; home page background in `index.html` |
+| Breakfast cut-off time | `availableUntil` on the Breakfast section in `assets/js/menu-data.js` |
 | Phone, email, address, social links, opening hours | `assets/js/config.js` |
 | Page wording | `index.html`, `about.html`, `contact.html` |
 | Logo | replace `assets/img/logo.png` and `assets/img/logo-small.png` |

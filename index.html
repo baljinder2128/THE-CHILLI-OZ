@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Chilli'Oz · Where spice meets sweet</title>
-<meta name="description" content="Neighbourhood café in Melbourne serving specialty coffee, fresh pastries, gourmet toasties and spice-meets-sweet signatures. Order online for pickup.">
+<meta name="description" content="Melbourne café and kitchen: big breakfasts, coffee, seafood, steak, pasta, kids meals and desserts. Order online for pickup.">
 <meta name="theme-color" content="#4A2214">
 <meta property="og:title" content="The Chilli'Oz · Where spice meets sweet">
-<meta property="og:description" content="Neighbourhood café in Melbourne serving specialty coffee, fresh pastries, gourmet toasties and spice-meets-sweet signatures. Order online for pickup.">
+<meta property="og:description" content="Melbourne café and kitchen: big breakfasts, coffee, seafood, steak, pasta, kids meals and desserts. Order online for pickup.">
 <meta property="og:image" content="assets/img/logo.png">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,19 +18,21 @@
 <body data-page="index">
 <header class="site-header" id="site-header"></header>
 <main id="main">
-<section class="hero">
+<section class="hero hero-photo">
+  <img class="hero-bg" src="https://images.unsplash.com/photo-1749922217403-412f69429dc5?auto=format&amp;fit=crop&amp;w=1600&amp;q=70" alt="" onerror="this.classList.add('is-missing')">
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow">Melbourne café · Order ahead for pickup</p>
+      <p class="eyebrow">Melbourne café &amp; kitchen · Order online for pickup</p>
       <h1>Where <span class="spice">spice</span> meets <span class="sweet">sweet</span></h1>
-      <p class="lead">Specialty coffee, pastries baked every morning and gourmet toasties, with a menu of signatures that balance a gentle chilli warmth with comforting sweetness.</p>
+      <p class="lead">Big breakfasts, great coffee, fresh seafood, steaks, pasta and homemade desserts, with a little chilli kick wherever it belongs.</p>
       <div class="hero-actions">
-        <a class="btn" href="menu.html">Order for pickup</a>
-        <a class="btn btn-ghost" href="about.html">Our story</a>
+        <a class="btn" href="menu.html">Order now</a>
+        <a class="btn btn-ghost" href="menu.html#breakfast">See the menu</a>
       </div>
       <ul class="hero-facts">
-        <li>Open from 5am weekdays</li>
+        <li>Breakfast until 11:30am</li>
         <li>Indoor &amp; outdoor dining available to enjoy your meal</li>
+        <li>Kids menu</li>
       </ul>
     </div>
     <img class="hero-logo" src="assets/img/logo.png" alt="The Chilli'Oz logo: a cheerful green chilli barista serving a cappuccino" width="494" height="494">
@@ -40,26 +42,23 @@
 <section class="section">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Signatures</p>
-      <h2>Flavour first, not just heat</h2>
-      <p class="lead">A few favourites from the spice-meets-sweet side of the menu. Add them straight to your order.</p>
+      <p class="eyebrow">The menu</p>
+      <h2>Something for every appetite</h2>
+      <p class="lead">Tap a section to see every dish and add it to your order.</p>
     </div>
-    <div class="item-grid" id="featured-root"></div>
-    <p style="margin-top:24px"><a class="btn btn-ghost" href="menu.html">See the full menu</a></p>
+    <div class="tiles" id="tiles-root"></div>
   </div>
 </section>
 
 <section class="section band">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">On the counter</p>
-      <h2>Coffee, pastries and toasties</h2>
+      <p class="eyebrow">House favourites</p>
+      <h2>Our most-loved dishes</h2>
+      <p class="lead">Add them straight to your order from here.</p>
     </div>
-    <div class="trio">
-      <div><h3>Specialty coffee</h3><p>Beans from a local Melbourne roaster, plus a chai latte and a chilli-cocoa hot chocolate.</p><p class="from">From $5.00</p></div>
-      <div><h3>Pastries &amp; sweets</h3><p>Croissants, danishes and scones, next to chilli-chocolate brownies and cardamom buns.</p><p class="from">From $4.50</p></div>
-      <div><h3>Toasties &amp; kebabs</h3><p>Pressed to order: ham &amp; cheese, chicken &amp; chilli mayo, peri-peri veggie and fresh kebabs.</p><p class="from">From $9.00</p></div>
-    </div>
+    <div class="item-grid featured-grid" id="featured-root"></div>
+    <p style="margin-top:24px"><a class="btn btn-ghost" href="menu.html">See the full menu</a></p>
   </div>
 </section>
 
@@ -70,7 +69,7 @@
       <h2>Skip the queue in three steps</h2>
     </div>
     <ol class="steps">
-      <li><h3>Pick your order</h3><p>Choose from the menu, with your milk and an extra shot if you like.</p></li>
+      <li><h3>Pick your dishes</h3><p>Choose sizes, sauces and how you like your steak cooked.</p></li>
       <li><h3>Choose a pickup time</h3><p>As soon as possible, or any 15-minute slot in the next week.</p></li>
       <li><h3>Collect and enjoy</h3><p>We'll have it ready. Take it away, or grab a seat inside or out.</p></li>
     </ol>
@@ -81,8 +80,8 @@
   <div class="wrap visit">
     <div class="section-head" style="margin:0">
       <p class="eyebrow">Visit us</p>
-      <h2>Come in and say hi</h2>
-      <p class="lead">Free Wi-Fi, a kid-friendly brunch spot and a stamp card: your 10th coffee is free and your 5th pastry is half price.</p>
+      <h2>Come in and stay a while</h2>
+      <p class="lead">Indoor and outdoor seating, a kids menu and free Wi-Fi. Your 10th coffee on our stamp card is free.</p>
       <ul class="plain" id="visit-contact"></ul>
     </div>
     <div id="visit-hours"></div>

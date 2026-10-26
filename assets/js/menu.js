@@ -1,8 +1,7 @@
-/* Renders the menu (menu.html) and the featured signatures (index.html). */
+/* Renders the menu (menu.html), plus the featured dishes and section tiles on index.html. */
 (function () {
   var C = window.Chillioz;
-  var OPTIONS = window.CHILLIOZ_OPTIONS;
-  var TAG_LABELS = { signature: "Signature", spicy: "Spicy", veg: "Vegetarian" };
+  var TAG_LABELS = { spicy: "Spicy", veg: "Vegetarian", kids: "Kids" };
 
   function tagsHTML(tags) {
     if (!tags || !tags.length) return "";
@@ -11,35 +10,56 @@
     }).join("") + "</ul>";
   }
 
-  function optionsHTML(item) {
-    var opts = item.options && OPTIONS[item.options];
-    if (!opts) return "";
-    var id = "opt-" + item.id;
-    return '<div class="item-options">' +
-      '<label class="field-inline" for="' + id + '-milk">Milk ' +
-        '<select id="' + id + '-milk" data-milk>' +
-          opts.milk.map(function (m) {
-            return '<option value="' + C.esc(m.label) + '">' + C.esc(m.label) +
-              (m.price ? " +" + C.money(m.price) : "") + "</option>";
-          }).join("") +
-        "</select></label>" +
-      '<label class="field-inline check" for="' + id + '-shot">' +
-        '<input type="checkbox" id="' + id + '-shot" data-shot> Extra shot +' + C.money(opts.extraShot) +
-      "</label>" +
-    "</div>";
+  function priceHTML(item) {
+    if (item.sizes) {
+      return item.sizes.map(function (s) {
+        return '<span class="price-size"><small>' + C.esc(s.label) + "</small> " + C.money(s.price) + "</span>";
+      }).join("");
+    }
+    return C.money(item.price);
   }
 
-  function itemHTML(item) {
+  function optionsHTML(item, uid) {
+    var out = [];
+    if (item.sizes) {
+      out.push('<fieldset class="sizes"><legend class="visually-hidden">Size</legend>' +
+        item.sizes.map(function (s, i) {
+          var id = uid + "-size-" + i;
+          return '<input type="radio" name="' + uid + '-size" id="' + id + '" value="' + C.esc(s.label) + '"' +
+            (i === 0 ? " checked" : "") + ' data-size>' +
+            '<label for="' + id + '">' + C.esc(s.label) + " " + C.money(s.price) + "</label>";
+        }).join("") + "</fieldset>");
+    }
+    (item.choices || []).forEach(function (c, ci) {
+      var id = uid + "-c" + ci;
+      out.push('<label class="field-inline" for="' + id + '">' + C.esc(c.name) +
+        ' <select id="' + id + '" data-choice="' + C.esc(c.name) + '">' +
+        c.values.map(function (v) {
+          var label = C.valueLabel(v), add = C.valueAdd(v);
+          return '<option value="' + C.esc(label) + '"' + (c.initial === label ? " selected" : "") + ">" +
+            C.esc(label) + (add ? " +" + C.money(add) : "") + "</option>";
+        }).join("") + "</select></label>");
+    });
+    (item.addons || []).forEach(function (a, ai) {
+      var id = uid + "-a" + ai;
+      out.push('<label class="field-inline check" for="' + id + '"><input type="checkbox" id="' + id +
+        '" data-addon="' + C.esc(a.label) + '"> ' + C.esc(a.label) + (a.add ? " +" + C.money(a.add) : "") + "</label>");
+    });
+    return out.length ? '<div class="item-options">' + out.join("") + "</div>" : "";
+  }
+
+  function itemHTML(item, prefix) {
+    var uid = (prefix || "m") + "-" + item.id;
     var soldOut = !!item.soldOut;
     return '<article class="item' + (soldOut ? " is-sold-out" : "") + '" data-item="' + item.id + '">' +
       '<div class="item-head">' +
         '<h3 class="item-name">' + C.esc(item.name) + "</h3>" +
-        '<span class="item-price">' + C.money(item.price) + "</span>" +
+        '<span class="item-price">' + priceHTML(item) + "</span>" +
       "</div>" +
-      '<p class="item-desc">' + C.esc(item.desc || "") + "</p>" +
+      (item.desc ? '<p class="item-desc">' + C.esc(item.desc) + "</p>" : "") +
       tagsHTML(item.tags) +
       (soldOut ? '<p class="sold-out">Sold out today</p>' :
-        optionsHTML(item) +
+        optionsHTML(item, uid) +
         '<div class="item-actions">' +
           '<div class="stepper" role="group" aria-label="Quantity for ' + C.esc(item.name) + '">' +
             '<button type="button" data-step="-1" aria-label="One fewer">−</button>' +
@@ -51,6 +71,19 @@
     "</article>";
   }
 
+  function readLine(card) {
+    var line = { id: card.getAttribute("data-item"), qty: parseInt(card.querySelector("[data-qty]").textContent, 10) };
+    var size = card.querySelector("[data-size]:checked");
+    if (size) line.size = size.value;
+    var choices = {};
+    card.querySelectorAll("[data-choice]").forEach(function (sel) { choices[sel.getAttribute("data-choice")] = sel.value; });
+    if (Object.keys(choices).length) line.choices = choices;
+    var addons = [];
+    card.querySelectorAll("[data-addon]:checked").forEach(function (cb) { addons.push(cb.getAttribute("data-addon")); });
+    if (addons.length) line.addons = addons;
+    return line;
+  }
+
   function wireItems(root) {
     root.addEventListener("click", function (e) {
       var card = e.target.closest("[data-item]");
@@ -58,20 +91,16 @@
       var qtyEl = card.querySelector("[data-qty]");
       var step = e.target.closest("[data-step]");
       if (step) {
-        var q = Math.min(20, Math.max(1, parseInt(qtyEl.textContent, 10) + parseInt(step.getAttribute("data-step"), 10)));
-        qtyEl.textContent = q;
+        qtyEl.textContent = Math.min(20, Math.max(1, parseInt(qtyEl.textContent, 10) + parseInt(step.getAttribute("data-step"), 10)));
         return;
       }
       if (e.target.closest("[data-add]")) {
-        var milk = card.querySelector("[data-milk]");
-        var shot = card.querySelector("[data-shot]");
-        var line = { id: card.getAttribute("data-item"), qty: parseInt(qtyEl.textContent, 10) };
-        if (milk) line.milk = milk.value;
-        if (shot && shot.checked) line.extraShot = true;
+        var line = readLine(card);
         C.addToCart(line);
         qtyEl.textContent = 1;
-        if (shot) shot.checked = false;
-        toast("Added " + line.qty + " × " + C.findItem(line.id).name);
+        card.querySelectorAll("[data-addon]").forEach(function (cb) { cb.checked = false; });
+        var label = C.lineLabel(line);
+        toast("Added " + line.qty + " × " + C.findItem(line.id).name + (label ? " (" + label + ")" : ""));
       }
     });
   }
@@ -92,6 +121,12 @@
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3500);
   }
 
+  // If a photo fails to load, show the brand colour block instead of a broken image.
+  function photoHTML(src, alt, cls) {
+    return '<img class="' + cls + '" src="' + C.esc(src) + '" alt="' + C.esc(alt) + '" loading="lazy" ' +
+      'onerror="this.classList.add(\'is-missing\')">';
+  }
+
   function renderMenu(root) {
     var menu = window.CHILLIOZ_MENU;
     var jump = document.getElementById("menu-jump");
@@ -102,11 +137,14 @@
     }
     root.innerHTML = menu.map(function (cat) {
       return '<section class="menu-section" id="' + cat.id + '" aria-labelledby="h-' + cat.id + '">' +
-        '<header class="menu-section-head">' +
-          '<h2 id="h-' + cat.id + '">' + C.esc(cat.name) + "</h2>" +
-          (cat.blurb ? "<p>" + C.esc(cat.blurb) + "</p>" : "") +
+        '<header class="menu-banner">' +
+          (cat.photo ? photoHTML(cat.photo, cat.name, "menu-banner-img") : "") +
+          '<div class="menu-banner-text">' +
+            '<h2 id="h-' + cat.id + '">' + C.esc(cat.name) + "</h2>" +
+            (cat.blurb ? "<p>" + C.esc(cat.blurb) + "</p>" : "") +
+          "</div>" +
         "</header>" +
-        '<div class="item-grid">' + cat.items.map(itemHTML).join("") + "</div>" +
+        '<div class="item-grid">' + cat.items.map(function (it) { return itemHTML(it, "m"); }).join("") + "</div>" +
       "</section>";
     }).join("");
     wireItems(root);
@@ -115,16 +153,23 @@
   function renderFeatured(root) {
     var picks = [];
     window.CHILLIOZ_MENU.forEach(function (cat) {
-      cat.items.forEach(function (it) {
-        if (it.tags && it.tags.indexOf("signature") > -1 && !it.soldOut) picks.push(it);
-      });
+      cat.items.forEach(function (it) { if (it.featured && !it.soldOut) picks.push(it); });
     });
-    // One from each part of the menu reads better than four drinks in a row.
-    var chosen = ["chilli-cocoa", "chilli-brownie", "chicken-chilli-mayo", "spiced-chai"]
-      .map(C.findItem).filter(function (it) { return it && !it.soldOut; });
-    if (chosen.length < 4) chosen = picks.slice(0, 4);
-    root.innerHTML = chosen.map(itemHTML).join("");
+    root.innerHTML = picks.slice(0, 6).map(function (it) { return itemHTML(it, "f"); }).join("");
     wireItems(root);
+  }
+
+  function renderTiles(root) {
+    root.innerHTML = window.CHILLIOZ_MENU.map(function (cat) {
+      var from = Math.min.apply(null, cat.items.map(function (it) {
+        return it.sizes ? it.sizes[0].price : it.price;
+      }));
+      return '<a class="tile" href="menu.html#' + cat.id + '">' +
+        (cat.photo ? photoHTML(cat.photo, "", "tile-img") : "") +
+        '<span class="tile-text"><span class="tile-name">' + C.esc(cat.name) + "</span>" +
+        '<span class="tile-from">from ' + C.money(from) + "</span></span>" +
+      "</a>";
+    }).join("");
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -132,5 +177,7 @@
     if (m) renderMenu(m);
     var f = document.getElementById("featured-root");
     if (f) renderFeatured(f);
+    var t = document.getElementById("tiles-root");
+    if (t) renderTiles(t);
   });
 })();

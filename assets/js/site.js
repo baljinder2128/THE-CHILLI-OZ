@@ -113,21 +113,60 @@
     return null;
   }
 
-  // Price of one unit including options, always worked out from menu-data.js.
+  function findCategory(id) {
+    var menu = window.CHILLIOZ_MENU || [];
+    for (var i = 0; i < menu.length; i++) {
+      for (var j = 0; j < menu[i].items.length; j++) {
+        if (menu[i].items[j].id === id) return menu[i];
+      }
+    }
+    return null;
+  }
+
+  // A choice value is either plain text or { label, add }.
+  function valueLabel(v) { return typeof v === "string" ? v : v.label; }
+  function valueAdd(v) { return typeof v === "string" ? 0 : (v.add || 0); }
+
+  // Price of one unit including size and extras, always worked out from menu-data.js.
   function unitPrice(line) {
     var item = findItem(line.id);
     if (!item) return 0;
-    var p = item.price;
-    var opts = item.options && window.CHILLIOZ_OPTIONS[item.options];
-    if (opts && line.milk) {
-      opts.milk.forEach(function (m) { if (m.label === line.milk) p += m.price; });
+    var p = item.price || 0;
+    if (item.sizes) {
+      var size = item.sizes.filter(function (s) { return s.label === line.size; })[0] || item.sizes[0];
+      p = size.price;
     }
-    if (opts && line.extraShot) p += opts.extraShot;
+    (item.choices || []).forEach(function (c) {
+      var picked = line.choices && line.choices[c.name];
+      c.values.forEach(function (v) { if (valueLabel(v) === picked) p += valueAdd(v); });
+    });
+    (item.addons || []).forEach(function (a) {
+      if (line.addons && line.addons.indexOf(a.label) > -1) p += a.add || 0;
+    });
     return p;
   }
 
+  // "Large, Latte, Oat milk" — what the kitchen needs to know about a line.
+  function lineLabel(line) {
+    var item = findItem(line.id), bits = [];
+    if (!item) return "";
+    if (item.sizes && line.size) bits.push(line.size);
+    (item.choices || []).forEach(function (c) {
+      var v = line.choices && line.choices[c.name];
+      if (v) bits.push(c.name === "Milk" ? v + " milk" : c.name === "Sauce" ? v + " sauce" : v);
+    });
+    (line.addons || []).forEach(function (a) { bits.push(a); });
+    return bits.join(", ");
+  }
+
   function lineKey(line) {
-    return [line.id, line.milk || "", line.extraShot ? "x" : ""].join("|");
+    return JSON.stringify([line.id, line.size || "", line.choices || {}, (line.addons || []).slice().sort()]);
+  }
+
+  // Sections like breakfast are only served until a set time.
+  function availableUntil(id) {
+    var cat = findCategory(id);
+    return cat && cat.availableUntil ? toMinutes(cat.availableUntil) : null;
   }
 
   function addToCart(line) {
@@ -242,14 +281,16 @@
         '<div><h2 class="footer-h">Find us</h2><ul class="plain">' + contactLinesHTML() + '</ul></div>' +
         '<div><h2 class="footer-h">Opening hours</h2>' + hoursListHTML() + '</div>' +
       '</div>' +
-      '<p class="footer-small">© ' + new Date().getFullYear() + ' The Chilli\'Oz · Specialty coffee, pastries &amp; gourmet toasties</p>';
+      '<p class="footer-small">© ' + new Date().getFullYear() + ' The Chilli\'Oz · Breakfast, coffee, seafood, steak &amp; more · Food photos from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></p>';
   }
 
   window.Chillioz = {
     money: money, esc: esc, formatTime: formatTime, cafeDay: cafeDay, pickupSlots: pickupSlots,
     openStatus: openStatus, hoursListHTML: hoursListHTML, contactLinesHTML: contactLinesHTML,
     readCart: readCart, writeCart: writeCart, addToCart: addToCart, findItem: findItem,
-    unitPrice: unitPrice, lineKey: lineKey, cartCount: cartCount
+    findCategory: findCategory, unitPrice: unitPrice, lineKey: lineKey, lineLabel: lineLabel,
+    valueLabel: valueLabel, valueAdd: valueAdd, availableUntil: availableUntil,
+    toMinutes: toMinutes, cafeNow: cafeNow, cartCount: cartCount
   };
 
   document.addEventListener("DOMContentLoaded", function () {
