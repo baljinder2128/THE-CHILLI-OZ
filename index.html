@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Chilli'Oz · Where spice meets sweet</title>
+<meta name="description" content="Neighbourhood café in Melbourne serving specialty coffee, fresh pastries, gourmet toasties and spice-meets-sweet signatures. Order online for pickup.">
+<meta name="theme-color" content="#4A2214">
+<meta property="og:title" content="The Chilli'Oz · Where spice meets sweet">
+<meta property="og:description" content="Neighbourhood café in Melbourne serving specialty coffee, fresh pastries, gourmet toasties and spice-meets-sweet signatures. Order online for pickup.">
+<meta property="og:image" content="assets/img/logo.png">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="index">
+<header class="site-header" id="site-header"></header>
+<main id="main">
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">Melbourne café · Order ahead for pickup</p>
+      <h1>Where <span class="spice">spice</span> meets <span class="sweet">sweet</span></h1>
+      <p class="lead">Specialty coffee, pastries baked every morning and gourmet toasties, with a menu of signatures that balance a gentle chilli warmth with comforting sweetness.</p>
+      <div class="hero-actions">
+        <a class="btn" href="menu.html">Order for pickup</a>
+        <a class="btn btn-ghost" href="about.html">Our story</a>
+      </div>
+      <ul class="hero-facts">
+        <li>Open from 5am weekdays</li>
+        <li>Pay when you collect</li>
+        <li>About 30 seats inside and out</li>
+      </ul>
+    </div>
+    <img class="hero-logo" src="assets/img/logo.png" alt="The Chilli'Oz logo: a cheerful green chilli barista serving a cappuccino" width="494" height="494">
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Signatures</p>
+      <h2>Flavour first, not just heat</h2>
+      <p class="lead">A few favourites from the spice-meets-sweet side of the menu. Add them straight to your order.</p>
+    </div>
+    <div class="item-grid" id="featured-root"></div>
+    <p style="margin-top:24px"><a class="btn btn-ghost" href="menu.html">See the full menu</a></p>
+  </div>
+</section>
+
+<section class="section band">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">On the counter</p>
+      <h2>Coffee, pastries and toasties</h2>
+    </div>
+    <div class="trio">
+      <div><h3>Specialty coffee</h3><p>Beans from a local Melbourne roaster, plus a chai latte and a chilli-cocoa hot chocolate.</p><p class="from">From $5.00</p></div>
+      <div><h3>Pastries &amp; sweets</h3><p>Croissants, danishes and scones, next to chilli-chocolate brownies and cardamom buns.</p><p class="from">From $4.50</p></div>
+      <div><h3>Toasties &amp; kebabs</h3><p>Pressed to order: ham &amp; cheese, chicken &amp; chilli mayo, peri-peri veggie and fresh kebabs.</p><p class="from">From $9.00</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Order online</p>
+      <h2>Skip the queue in three steps</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Pick your order</h3><p>Choose from the menu, with your milk and an extra shot if you like.</p></li>
+      <li><h3>Choose a pickup time</h3><p>As soon as possible, or any 15-minute slot in the next week.</p></li>
+      <li><h3>Collect and pay</h3><p>We'll have it ready. Pay at the counter when you pick it up.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section band">
+  <div class="wrap visit">
+    <div class="section-head" style="margin:0">
+      <p class="eyebrow">Visit us</p>
+      <h2>Come in and say hi</h2>
+      <p class="lead">Free Wi-Fi, a kid-friendly brunch spot and a stamp card: your 10th coffee is free and your 5th pastry is half price.</p>
+      <ul class="plain" id="visit-contact"></ul>
+    </div>
+    <div id="visit-hours"></div>
+  </div>
+</section>
+</main>
+<footer class="site-footer" id="site-footer"></footer>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/menu-data.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/menu.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("visit-hours").innerHTML = '<h3 style="margin-bottom:10px">Opening hours</h3>' + Chillioz.hoursListHTML();
+  document.getElementById("visit-contact").innerHTML = Chillioz.contactLinesHTML();
+});
+</script>
+</body>
+</html>
