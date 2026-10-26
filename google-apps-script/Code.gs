@@ -169,7 +169,7 @@ function confirmCustomer_(d) {
     "<h2 style='color:#E03A22;margin:0 0 8px'>Thanks, " + esc_(d.name) + "!</h2>" +
     "<p>We've got your order <b>" + d.orderId + "</b> and will have it ready for pickup " +
     esc_(d.pickup) + ".</p>" + itemsTable_(d) +
-    "<p>Please pay when you collect. See you soon!</p>" +
+    "<p>See you soon!</p>" +
     "<p style='color:#4FAE2E'><b>" + CAFE_NAME + "</b> · Where spice meets sweet</p></div>";
   MailApp.sendEmail({
     to: d.email,
